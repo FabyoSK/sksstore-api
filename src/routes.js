@@ -17,6 +17,8 @@ routes.get('/products/:supplier_id/:id', ProductController.indexOne);
 
 routes.use(authMiddleware);
 
+routes.get('/me', UserController.index);
+
 routes.post('/checkout', OrderController.store);
 routes.get('/orders', OrderController.index);
 

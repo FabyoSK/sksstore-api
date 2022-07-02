@@ -37,6 +37,26 @@ class UserController {
       }),
     });
   }
+
+  async index(req, res) {
+    const userExists = await User.findOne({
+      where: { id: req.user_id },
+    });
+
+    if (!userExists) {
+      return res.status(400).json({ error: 'User not exists.' });
+    }
+
+    const { id, name, email } = userExists;
+
+    return res.status(200).json({
+      name,
+      email,
+      token: jwt.sign({ id }, authConfig.secret, {
+        expiresIn: authConfig.expiresIn,
+      }),
+    });
+  }
 }
 
 export default new UserController();
