@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import OrderController from './app/controllers/OrderController';
 import ProductController from './app/controllers/ProductController';
 import SessionController from './app/controllers/SessionController';
 
@@ -12,6 +13,10 @@ routes.post('/users', UserController.store);
 routes.post('/sessions', SessionController.store);
 
 routes.get('/products', ProductController.index);
+routes.get('/products/:supplier_id/:id', ProductController.indexOne);
+
 routes.use(authMiddleware);
+
+routes.post('/checkout', OrderController.store);
 
 export default routes;
