@@ -4,9 +4,12 @@ class OrderProduct extends Model {
   static init(sequelize) {
     super.init(
       {
-        name: Sequelize.STRING,
         product_id: Sequelize.STRING,
         supplier_id: Sequelize.STRING,
+        quantity: Sequelize.STRING,
+        price: Sequelize.STRING,
+        name: Sequelize.STRING,
+        image_url: Sequelize.STRING,
       },
       {
         sequelize,
