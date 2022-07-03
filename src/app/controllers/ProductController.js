@@ -3,36 +3,9 @@ import suppliers from '../../config/suppliers';
 
 class ProductController {
   async index(req, res) {
-    const productOneResponse = await axios.get(suppliers.supplier_1.api);
-    const productTwoResponse = await axios.get(suppliers.supplier_2.api);
-
-    const supplierProductOne = productOneResponse.data.splice(0, 5).map(product => ({
-      id: product.id,
-      supplier_id: suppliers.supplier_1.id,
-      name: product.nome,
-      description: product.descricao,
-      category: product.categoria,
-      image: product.imagem,
-      price: product.preco,
-      material: product.material,
-      department: product.departamento,
-    }));
-
-    const supplierProductTwo = productTwoResponse.data.splice(0, 5).map(product => ({
-      id: product.id,
-      supplier_id: suppliers.supplier_2.id,
-      name: product.name,
-      description: product.description,
-      discount: product.discountValue,
-      gallery: product.gallery,
-      price: product.price,
-      material: product.details.material,
-      // hasDiscount: product.hasDiscount,
-    }));
-
-    const products = [...supplierProductOne,...supplierProductTwo];
+    const products = await getProducts();
     return res.json(products);
-  },
+  }
 
   async indexOne(req, res) {
     const { supplier_id, id } = req.params;
@@ -54,7 +27,7 @@ class ProductController {
 
     const product = {
       id: productResponse.id,
-      supplier_id: supplier_id,
+      supplier_id,
       name: productResponse.nome,
       description: productResponse.descricao,
       category: productResponse.categoria,
@@ -66,6 +39,76 @@ class ProductController {
 
     return res.json(product);
   }
+
+  async search(req, res) {
+    const q = req.query;
+    const products = await getProducts();
+
+    const filteredProducts = products.filter(product => {
+      if (product.name.includes(q.name)) {
+        if (
+          Number(q.max_price) !== 0 &&
+          !(
+            Number(product.price) >= Number(q.min_price) &&
+            Number(product.price) <= Number(q.max_price)
+          )
+        ) {
+          return null;
+        }
+        if (q.material !== null && q.material !== 'null') {
+          return product.material.includes(q.material) ? product : null;
+        }
+
+        return product;
+      }
+    });
+
+    return res.json(filteredProducts);
+  }
+
+  async indexCategories(req, res) {
+    const products = await getProducts();
+
+    const materials = products.map(product => product.material);
+    const uniqueMaterials = Array.from(new Set(materials));
+
+    return res.json({
+      materials: uniqueMaterials,
+    });
+  }
 }
+
+const getProducts = async () => {
+  const productOneResponse = await axios.get(suppliers.supplier_1.api);
+  const productTwoResponse = await axios.get(suppliers.supplier_2.api);
+
+  const supplierProductOne = productOneResponse.data.map(product => ({
+    id: product.id,
+    supplier_id: suppliers.supplier_1.id,
+    name: product.nome,
+    description: product.descricao,
+    category: product.categoria,
+    image: product.imagem,
+    price: product.preco,
+    material: product.material,
+    department: product.departamento,
+  }));
+
+  const supplierProductTwo = productTwoResponse.data.map(product => ({
+    id: product.id,
+    supplier_id: suppliers.supplier_2.id,
+    name: product.name,
+    description: product.description,
+    discount: product.discountValue,
+    gallery: product.gallery,
+    price: product.price,
+    material: product.details.material,
+    has_discount: product.hasDiscount,
+  }));
+
+  const products = [...supplierProductOne, ...supplierProductTwo];
+
+  return products;
+};
 
 export default new ProductController();

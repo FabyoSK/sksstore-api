@@ -39,7 +39,7 @@ class OrderController {
 
     const orders = await Order.findAll({
       where: {
-        user_id: 1,
+        user_id,
       },
       include: { association: 'products' },
     });

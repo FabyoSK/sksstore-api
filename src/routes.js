@@ -14,6 +14,8 @@ routes.post('/sessions', SessionController.store);
 
 routes.get('/products', ProductController.index);
 routes.get('/products/:supplier_id/:id', ProductController.indexOne);
+routes.get('/products/search', ProductController.search);
+routes.get('/products/categories', ProductController.indexCategories);
 
 routes.use(authMiddleware);
 
