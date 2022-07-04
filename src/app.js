@@ -8,6 +8,7 @@ import cors from 'cors';
 import routes from './routes';
 
 import './database';
+import redis from './config/redis';
 
 class App {
   constructor() {
@@ -16,6 +17,7 @@ class App {
     this.middlewares();
     this.routes();
     this.exceptionHandler();
+    this.redis();
   }
 
   middlewares() {
@@ -31,12 +33,15 @@ class App {
     this.server.use(async (err, req, res, next) => {
       if (process.env.NODE_ENV === 'development') {
         const errors = await new Youch(err, req).toJSON();
-
         return res.status(500).json(errors);
       }
 
       return res.status(500).json({ error: 'Internal server error' });
     });
+  }
+
+  async redis() {
+    await redis.connect();
   }
 }
 
