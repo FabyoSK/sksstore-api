@@ -63,8 +63,6 @@ class ProductController {
         break;
     }
 
-    console.log('FSK => req.params:', req.params);
-    console.log('FSK => api_url:', api_url);
     const response = await axios.get(api_url);
     const productResponse = response.data.find(product => product.id === id);
 
